@@ -1,0 +1,39 @@
+{
+  "expo": {
+    "name": "InsureAssist",
+    "slug": "insure-assist",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "scheme": "insureassist",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "light",
+    "splash": {
+      "image": "./assets/splash.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#00AAB5"
+    },
+    "ios": {
+      "supportsTablet": false,
+      "bundleIdentifier": "com.sc.insureassist"
+    },
+    "android": {
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/adaptive-icon.png",
+        "backgroundColor": "#00AAB5"
+      },
+      "package": "com.sc.insureassist",
+      "intentFilters": [
+        {
+          "action": "VIEW",
+          "autoVerify": true,
+          "data": [{ "scheme": "insureassist" }],
+          "category": ["BROWSABLE", "DEFAULT"]
+        }
+      ]
+    },
+    "web": {
+      "favicon": "./assets/favicon.png"
+    },
+    "plugins": ["expo-router"]
+  }
+}

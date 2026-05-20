@@ -1,0 +1,46 @@
+services:
+  - type: web
+    name: insure-assist-bff
+    runtime: node
+    rootDir: services/bff
+    buildCommand: npm install && npm run build
+    startCommand: npm start
+    plan: free
+    healthCheckPath: /health
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: "3000"
+      # InsureMO — Life Term (LimoPOC)
+      - key: INSUREMO_AUTH_URL
+        value: https://portal.insuremo.com/cas/ebao/v1/json/tickets
+      - key: INSUREMO_API_BASE
+        value: https://portal-gw.insuremo.com/ebaoli/1.0
+      - key: INSUREMO_USERNAME
+        value: limopocuser1
+      - key: INSUREMO_PASSWORD
+        sync: false        # set in Render dashboard — do not commit real value
+      - key: INSUREMO_TENANT_NAME
+        value: LimoPOC
+      - key: INSUREMO_TENANT_ID
+        value: f63cdb8d-240d-4e26-b0d9-05e9276a65ca
+      # HALB tenant (optional — leave blank if not yet available)
+      - key: INSUREMO_HALB_TENANT
+        value: inecosystem
+      - key: INSUREMO_HALB_API_BASE
+        value: https://inecosystem-gimc.insuremo.com/proposal/v1
+      - key: INSUREMO_HALB_USERNAME
+        sync: false        # set in Render dashboard when available
+      - key: INSUREMO_HALB_PASSWORD
+        sync: false
+      # Payment gateway
+      - key: PAYMENT_GATEWAY
+        value: mock
+      # JWT — MUST set a strong random value in Render dashboard
+      - key: JWT_SECRET
+        sync: false
+      # Demo agent credentials (JSON array — override in Render dashboard)
+      # Format: [{"agentId":"a1","name":"Agent","email":"x@y.com","password":"pass","tenantIds":["LimoPOC"]}]
+      - key: AGENT_CREDENTIALS
+        sync: false
