@@ -1,10 +1,9 @@
 services:
   - type: web
     name: insure-assist-bff
-    runtime: node
-    rootDir: services/bff
-    buildCommand: npm install && npm run build
-    startCommand: npm start
+    runtime: docker
+    dockerfilePath: services/bff/Dockerfile
+    dockerContext: services/bff
     plan: free
     healthCheckPath: /health
     envVars:
