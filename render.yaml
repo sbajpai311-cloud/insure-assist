@@ -9,6 +9,8 @@ services:
     envVars:
       - key: NODE_ENV
         value: production
+      - key: PORT
+        value: "3000"
       # InsureMO — Life Term (LimoPOC)
       - key: INSUREMO_AUTH_URL
         value: https://portal.insuremo.com/cas/ebao/v1/json/tickets

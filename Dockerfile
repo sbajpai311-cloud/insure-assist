@@ -14,9 +14,7 @@ COPY services/bff/tsconfig.json ./
 # Compile TypeScript
 RUN npm run build
 
-# Runtime env
 ENV NODE_ENV=production
-
-# Render injects PORT — server reads process.env.PORT
+ENV PORT=3000
 EXPOSE 3000
 CMD ["node", "dist/server.js"]
