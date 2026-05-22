@@ -1,32 +1,22 @@
-# ── Stage 1: Build ──────────────────────────────────────────────────────────
-FROM node:20-alpine AS builder
+FROM node:20-alpine
 WORKDIR /app
 
-# Copy only the BFF package.json (not the monorepo root — avoids workspace errors)
-COPY services/bff/package*.json ./
+# Copy BFF package.json only (not monorepo root — avoids workspace conflicts)
+COPY services/bff/package.json ./
 
-# Install all deps (including devDeps needed for TypeScript compilation)
+# Install all dependencies
 RUN npm install --legacy-peer-deps
 
-# Copy BFF source
-COPY services/bff/ ./
+# Copy BFF source files
+COPY services/bff/src ./src
+COPY services/bff/tsconfig.json ./
 
-# Compile TypeScript → dist/
+# Compile TypeScript
 RUN npm run build
 
-# ── Stage 2: Runtime ─────────────────────────────────────────────────────────
-FROM node:20-alpine AS runtime
-WORKDIR /app
+# Runtime env
 ENV NODE_ENV=production
 
-# Install production deps only
-COPY services/bff/package*.json ./
-RUN npm install --omit=dev --legacy-peer-deps
-
-# Copy compiled output from builder
-COPY --from=builder /app/dist ./dist
-
-# Render injects PORT dynamically — server reads process.env.PORT
+# Render injects PORT — server reads process.env.PORT
 EXPOSE 3000
-
 CMD ["node", "dist/server.js"]
