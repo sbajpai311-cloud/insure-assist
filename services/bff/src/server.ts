@@ -10,13 +10,17 @@ import { policyRoutes } from './routes/policy';
 import { wellnessRoutes } from './routes/wellness';
 import { paymentRoutes } from './routes/payments';
 
-const app = Fastify({ logger: true });
+const app = Fastify({ logger: true, trustProxy: true });
+
+// Respond to health check immediately — before any plugin processing
+app.addHook('onRequest', async (request, reply) => {
+  if (request.url === '/health') {
+    return reply.code(200).send({ status: 'ok', timestamp: new Date().toISOString() });
+  }
+});
 
 // Register plugins
-app.register(cors, {
-  origin: true,
-  credentials: true,
-});
+app.register(cors, { origin: '*' });
 
 app.register(jwt, {
   secret: process.env.JWT_SECRET ?? 'dev-secret-change-in-production',
@@ -30,9 +34,6 @@ app.decorate('authenticate', async (request: any, reply: any) => {
     reply.send(err);
   }
 });
-
-// Health check
-app.get('/health', async () => ({ status: 'ok', timestamp: new Date().toISOString() }));
 
 // Register routes
 app.register(authRoutes);
