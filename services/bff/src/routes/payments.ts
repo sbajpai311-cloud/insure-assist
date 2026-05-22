@@ -1,5 +1,5 @@
 import { FastifyInstance } from 'fastify';
-import { z } from 'zod';
+import { z, ZodError } from 'zod';
 import { getPaymentAdapter } from '../integrations/payment';
 import { issuePolicy } from '../integrations/insuremo/issuance';
 
@@ -18,7 +18,15 @@ export async function paymentRoutes(app: FastifyInstance) {
 
   // Step 1: Initiate payment
   app.post('/api/payments/initiate', { onRequest: [(app as any).authenticate] }, async (req, reply) => {
-    const body = InitiateSchema.parse(req.body);
+    let body: z.infer<typeof InitiateSchema>;
+    try {
+      body = InitiateSchema.parse(req.body);
+    } catch (e) {
+      if (e instanceof ZodError) {
+        return reply.status(400).send({ error: 'VALIDATION_ERROR', issues: e.issues });
+      }
+      throw e;
+    }
     const adapter = getPaymentAdapter();
 
     const result = await adapter.initiate({
