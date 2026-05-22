@@ -8,9 +8,10 @@ RUN npm run build
 FROM node:20-alpine AS runtime
 WORKDIR /app
 ENV NODE_ENV=production
+# Install production dependencies only — keeps image small
+COPY package*.json ./
+RUN npm install --omit=dev
 COPY --from=builder /app/dist ./dist
-COPY --from=builder /app/node_modules ./node_modules
 EXPOSE 3000
-HEALTHCHECK --interval=30s --timeout=10s --start-period=5s \
-  CMD wget -qO- http://localhost:3000/health || exit 1
+# No hardcoded HEALTHCHECK — Render uses healthCheckPath from render.yaml
 CMD ["node", "dist/server.js"]

@@ -2,15 +2,13 @@ services:
   - type: web
     name: insure-assist-bff
     runtime: docker
-    dockerfilePath: services/bff/Dockerfile
-    dockerContext: services/bff
+    dockerfilePath: ./Dockerfile
+    dockerContext: .
     plan: free
     healthCheckPath: /health
     envVars:
       - key: NODE_ENV
         value: production
-      - key: PORT
-        value: "3000"
       # InsureMO — Life Term (LimoPOC)
       - key: INSUREMO_AUTH_URL
         value: https://portal.insuremo.com/cas/ebao/v1/json/tickets

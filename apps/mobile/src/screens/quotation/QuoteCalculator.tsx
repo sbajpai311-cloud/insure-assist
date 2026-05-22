@@ -16,8 +16,8 @@ export default function QuoteCalculator() {
     gender: rec?.suggestedSA ? 'M' : 'M',
     birthdate: '1992-01-01',
     sumAssured: rec?.suggestedSA?.toString() ?? '1000000',
-    coverageYear: rec?.suggestedTerm?.toString() ?? '10',
-    chargeYear: rec?.suggestedTerm?.toString() ?? '10',
+    coverageYear: rec?.suggestedTerm?.toString() ?? '5',
+    chargeYear: rec?.suggestedTerm?.toString() ?? '5',
     paymentFreq: '1',
   });
   const [result, setResult] = useState<any>(null);
