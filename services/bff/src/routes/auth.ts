@@ -1,5 +1,5 @@
 import { FastifyInstance } from 'fastify';
-import { z } from 'zod';
+import { z, ZodError } from 'zod';
 import crypto from 'crypto';
 
 // ---------------------------------------------------------------------------
@@ -49,7 +49,15 @@ export async function authRoutes(app: FastifyInstance) {
 
   // POST /auth/login — email + password → BFF JWT
   app.post('/auth/login', async (req, reply) => {
-    const { email, password } = LoginSchema.parse(req.body);
+    let email: string, password: string;
+    try {
+      ({ email, password } = LoginSchema.parse(req.body));
+    } catch (e) {
+      if (e instanceof ZodError) {
+        return reply.status(400).send({ error: 'VALIDATION_ERROR', message: e.issues[0]?.message ?? 'Invalid input' });
+      }
+      throw e;
+    }
 
     const agents = loadAgents();
     const agent  = agents.find(a => a.email === email && a.password === password);

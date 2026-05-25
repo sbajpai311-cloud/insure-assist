@@ -22,11 +22,14 @@ export default function LoginScreen() {
       return;
     }
     setLoading(true);
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 35000);
     try {
       const res = await fetch(`${API_BASE.replace('/api', '')}/auth/login`, {
         method:  'POST',
         headers: { 'Content-Type': 'application/json' },
         body:    JSON.stringify({ email, password }),
+        signal:  controller.signal,
       }).then(r => r.json());
 
       if (res.error) {
@@ -36,8 +39,13 @@ export default function LoginScreen() {
       setToken(res.token);
       setAgent(res.agent);
     } catch (e: any) {
-      Alert.alert('Network Error', e.message);
+      if (e.name === 'AbortError') {
+        Alert.alert('Timeout', 'Server is waking up — please try again in a moment.');
+      } else {
+        Alert.alert('Network Error', e.message);
+      }
     } finally {
+      clearTimeout(timeout);
       setLoading(false);
     }
   };
