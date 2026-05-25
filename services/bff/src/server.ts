@@ -31,7 +31,7 @@ app.decorate('authenticate', async (request: any, reply: any) => {
   try {
     await request.jwtVerify();
   } catch (err) {
-    reply.send(err);
+    return reply.send(err);
   }
 });
 

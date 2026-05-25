@@ -25,7 +25,7 @@ export interface CustomerInput {
 }
 
 export async function submitApplication(customerData: CustomerInput) {
-  if (process.env.MOCK_INSUREMO === 'true') {
+  if (process.env.MOCK_INSUREMO !== 'false') {
     await new Promise(r => setTimeout(r, 600));
     const mockId = Date.now();
     const installPrem = Math.round(customerData.sumAssured * 0.0025);

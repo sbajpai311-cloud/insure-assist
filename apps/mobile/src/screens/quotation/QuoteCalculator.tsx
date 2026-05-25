@@ -25,10 +25,13 @@ export default function QuoteCalculator() {
 
   const handleCalculate = async () => {
     setLoading(true);
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 30000);
     try {
       const res = await fetch(`${API_BASE}/quote`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+        signal: controller.signal,
         body: JSON.stringify({
           gender: form.gender,
           birthdate: new Date(form.birthdate).toISOString(),
@@ -45,8 +48,10 @@ export default function QuoteCalculator() {
       }
       setResult(res);
     } catch (e: any) {
-      Alert.alert('Network Error', e.message);
+      const msg = e.name === 'AbortError' ? 'Request timed out. The server may be waking up — please try again.' : e.message;
+      Alert.alert('Network Error', msg);
     } finally {
+      clearTimeout(timeout);
       setLoading(false);
     }
   };

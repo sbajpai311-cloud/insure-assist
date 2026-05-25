@@ -6,6 +6,12 @@ beforeAll(() => {
   process.env.INSUREMO_AUTH_URL = 'https://portal.insuremo.com/cas/ebao/v1/json/tickets';
   process.env.INSUREMO_API_BASE = 'https://portal-gw.insuremo.com/ebaoli/1.0';
   process.env.INSUREMO_TENANT_ID = 'f63cdb8d-240d-4e26-b0d9-05e9276a65ca';
+  // Force real InsureMO path so nock interceptors are exercised
+  process.env.MOCK_INSUREMO = 'false';
+});
+
+afterAll(() => {
+  delete process.env.MOCK_INSUREMO;
 });
 
 afterEach(() => {

@@ -6,7 +6,7 @@ export async function issuePolicy(
   feeAmount: number,
   currency: number
 ) {
-  if (process.env.MOCK_INSUREMO === 'true') {
+  if (process.env.MOCK_INSUREMO !== 'false') {
     await new Promise(r => setTimeout(r, 500));
     const mockId = Date.now();
     return {
