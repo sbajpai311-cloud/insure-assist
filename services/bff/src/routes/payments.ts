@@ -50,7 +50,7 @@ export async function paymentRoutes(app: FastifyInstance) {
       transactionId: string;
       proposalNumber: string;
       feeAmount: number;
-      currency: number;
+      currency: string;
     };
 
     const adapter = getPaymentAdapter();
@@ -65,7 +65,18 @@ export async function paymentRoutes(app: FastifyInstance) {
     }
 
     // Payment confirmed — now issue policy with InsureMO
-    const issuance = await issuePolicy(proposalNumber, feeAmount, currency);
+    let issuance;
+    try {
+      issuance = await issuePolicy(proposalNumber, feeAmount, currency as any);
+    } catch (err: any) {
+      app.log.error({ err }, 'InsureMO issuance failed');
+      return reply.status(502).send({
+        error: 'ISSUANCE_FAILED',
+        message: err.response?.data
+          ? JSON.stringify(err.response.data)
+          : (err.message ?? 'Policy issuance failed'),
+      });
+    }
 
     return reply.send({
       payment,
