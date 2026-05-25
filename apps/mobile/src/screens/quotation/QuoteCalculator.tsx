@@ -1,9 +1,12 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { View, Text, TextInput, TouchableOpacity, ActivityIndicator, Alert, StyleSheet, ScrollView } from 'react-native';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import { theme } from '../../theme';
 import { API_BASE } from '../../config/api';
 import { useAuthStore } from '../../store/authStore';
+
+const HEALTH_URL = API_BASE.replace('/api', '') + '/health';
+const QUOTE_TIMEOUT_MS = 65000;
 
 export default function QuoteCalculator() {
   const navigation = useNavigation<any>();
@@ -22,11 +25,24 @@ export default function QuoteCalculator() {
   });
   const [result, setResult] = useState<any>(null);
   const [loading, setLoading] = useState(false);
+  const [warmingUp, setWarmingUp] = useState(false);
+  const warmUpTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  // Pre-warm the server when this screen mounts so cold-start completes
+  // before the user taps Calculate.
+  useEffect(() => {
+    fetch(HEALTH_URL).catch(() => {/* ignore */});
+  }, []);
 
   const handleCalculate = async () => {
     setLoading(true);
+    setWarmingUp(false);
+
+    // Show "warming up" hint after 8 s so the user knows to keep waiting
+    warmUpTimer.current = setTimeout(() => setWarmingUp(true), 8000);
+
     const controller = new AbortController();
-    const timeout = setTimeout(() => controller.abort(), 30000);
+    const timeout = setTimeout(() => controller.abort(), QUOTE_TIMEOUT_MS);
     try {
       const res = await fetch(`${API_BASE}/quote`, {
         method: 'POST',
@@ -48,11 +64,15 @@ export default function QuoteCalculator() {
       }
       setResult(res);
     } catch (e: any) {
-      const msg = e.name === 'AbortError' ? 'Request timed out. The server may be waking up — please try again.' : e.message;
+      const msg = e.name === 'AbortError'
+        ? 'The server took too long to respond. Please try again — it should be warm now.'
+        : e.message;
       Alert.alert('Network Error', msg);
     } finally {
       clearTimeout(timeout);
+      if (warmUpTimer.current) clearTimeout(warmUpTimer.current);
       setLoading(false);
+      setWarmingUp(false);
     }
   };
 
@@ -133,7 +153,16 @@ export default function QuoteCalculator() {
         </View>
 
         <TouchableOpacity style={styles.calcButton} onPress={handleCalculate} disabled={loading}>
-          {loading ? <ActivityIndicator color="#fff" /> : <Text style={styles.calcButtonText}>Calculate Premium</Text>}
+          {loading ? (
+            <View style={styles.loadingRow}>
+              <ActivityIndicator color="#fff" />
+              {warmingUp && (
+                <Text style={styles.warmingText}>Warming up server…</Text>
+              )}
+            </View>
+          ) : (
+            <Text style={styles.calcButtonText}>Calculate Premium</Text>
+          )}
         </TouchableOpacity>
       </View>
 
@@ -223,6 +252,8 @@ const styles = StyleSheet.create({
     marginTop: theme.spacing[5],
   },
   calcButtonText: { color: theme.colors.white, fontWeight: '600', fontSize: 16 },
+  loadingRow: { flexDirection: 'row', alignItems: 'center', gap: theme.spacing[3] },
+  warmingText: { color: theme.colors.white, fontSize: 13, opacity: 0.85 },
   resultCard: {
     backgroundColor: theme.colors.white,
     margin: theme.spacing[4],

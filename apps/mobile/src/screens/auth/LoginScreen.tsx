@@ -38,6 +38,8 @@ export default function LoginScreen() {
       }
       setToken(res.token);
       setAgent(res.agent);
+      // Fire-and-forget warm-up ping so the BFF is hot before the user reaches the quote screen
+      fetch(`${API_BASE.replace('/api', '')}/health`).catch(() => {/* ignore */});
     } catch (e: any) {
       if (e.name === 'AbortError') {
         Alert.alert('Timeout', 'Server is waking up — please try again in a moment.');
