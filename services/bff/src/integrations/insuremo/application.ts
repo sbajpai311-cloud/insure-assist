@@ -25,6 +25,17 @@ export interface CustomerInput {
 }
 
 export async function submitApplication(customerData: CustomerInput) {
+  if (process.env.MOCK_INSUREMO === 'true') {
+    await new Promise(r => setTimeout(r, 600));
+    const mockId = Date.now();
+    const installPrem = Math.round(customerData.sumAssured * 0.0025);
+    return {
+      proposalNumber: `PROP-MOCK-${mockId}`,
+      currency:       28,
+      installPrem:    installPrem,
+    };
+  }
+
   const token = await getInsureMoToken();
   const randomInt = Math.floor(Math.random() * 9999999999999999);
 

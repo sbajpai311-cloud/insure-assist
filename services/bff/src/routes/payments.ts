@@ -50,7 +50,7 @@ export async function paymentRoutes(app: FastifyInstance) {
       transactionId: string;
       proposalNumber: string;
       feeAmount: number;
-      currency: string;
+      currency: number;
     };
 
     const adapter = getPaymentAdapter();

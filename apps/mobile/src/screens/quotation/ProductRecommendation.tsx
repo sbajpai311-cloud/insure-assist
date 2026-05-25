@@ -3,9 +3,6 @@ import { View, Text, ScrollView, TouchableOpacity, StyleSheet } from 'react-nati
 import { useNavigation } from '@react-navigation/native';
 import { useFNAStore } from '../../store/fnaStore';
 import { theme } from '../../theme';
-import { generateRecommendations } from '../../../../services/bff/src/engines/fna-recommender';
-
-// Fallback inline recommender (identical logic) so mobile bundle is self-contained
 function getRecommendations(fna: any) {
   const recs: any[] = [];
   const humanLifeValue = fna.monthlyIncome * 12 * ((fna.retirementAge ?? 60) - fna.age);

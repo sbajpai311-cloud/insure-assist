@@ -60,7 +60,7 @@ export default function ApplicationForm() {
       }).then(r => r.json());
 
       if (res.error) {
-        Alert.alert('Application Error', res.error);
+        Alert.alert('Application Error', res.message ?? res.error);
         return;
       }
 

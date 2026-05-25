@@ -36,6 +36,9 @@ services:
       # Payment gateway
       - key: PAYMENT_GATEWAY
         value: mock
+      # InsureMO mock mode — set false only when live InsureMO credentials are confirmed working
+      - key: MOCK_INSUREMO
+        value: "true"
       # JWT — MUST set a strong random value in Render dashboard
       - key: JWT_SECRET
         sync: false

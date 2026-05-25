@@ -40,7 +40,7 @@ export default function QuoteCalculator() {
       }).then(r => r.json());
 
       if (res.error) {
-        Alert.alert('Quote Error', res.error);
+        Alert.alert('Quote Error', res.message ?? res.error);
         return;
       }
       setResult(res);

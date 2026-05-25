@@ -11,6 +11,17 @@ export interface PremiumCalcRequest {
 }
 
 export async function calculatePremium(req: PremiumCalcRequest) {
+  if (process.env.MOCK_INSUREMO === 'true') {
+    await new Promise(r => setTimeout(r, 400)); // simulate latency
+    const annualPrem = Math.round(req.sumAssured * 0.0025);
+    const installPrem = Math.round(annualPrem / req.paymentFreq);
+    return {
+      stdPremAf:   annualPrem,
+      sumAssured:  req.sumAssured,
+      installPrem: installPrem,
+    };
+  }
+
   const token = await getInsureMoToken();
   const clientRequestId = `BI${Date.now()}`;
 

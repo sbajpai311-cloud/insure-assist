@@ -6,6 +6,16 @@ export async function issuePolicy(
   feeAmount: number,
   currency: number
 ) {
+  if (process.env.MOCK_INSUREMO === 'true') {
+    await new Promise(r => setTimeout(r, 500));
+    const mockId = Date.now();
+    return {
+      policyNumber: `POL-MOCK-${mockId}`,
+      riskStatus:   '1',
+      installPrem:  feeAmount,
+    };
+  }
+
   const token = await getInsureMoToken();
   const randomInt = Math.floor(Math.random() * 999999999999);
 
